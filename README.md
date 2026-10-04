@@ -208,7 +208,7 @@ Calling `update_goal` on an already-complete goal is idempotent and does not app
 
 Completed goals are terminal for automatic transitions: pause, resume, and hidden continuations do not reopen them. To recover from premature completion, use `/goal <objective>` to replace the goal, call `create_goal` with `replace_existing: true`, or `/goal clear` before starting again.
 
-In bridged MCP environments, pi may expose these tools under namespaced MCP names like `pi__get_goal`, `pi__create_goal`, and `pi__update_goal`. Prompt guidance tells models to call whichever goal-tool name is actually exposed in the current run, not display or transcript labels.
+In bridged MCP environments, pi may expose these tools under namespaced MCP names like `pi__get_goal`, `pi__create_goal`, and `pi__update_goal`. Prompt guidance explains naming once per prompt: call the exposed tool name, not display or transcript labels. Standing instructions and standalone full continuation prompts share a concise evidence-backed completion and blocked/resume contract; automatic continuations retain brief reminders.
 
 ## Behavior
 
