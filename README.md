@@ -176,12 +176,20 @@ If an interactive run appears stuck on `Working...` after a built-in `read` tool
 /goal resume
 /goal resume cancel
 /goal copy
+/goal edit
 /goal clear
 ```
 
 `/create-goal <task>` is the recommended way to start a goal. It expands the task into a strict objective and asks the model to call the `create_goal` tool with explicit replacement enabled, so you do not need to run `/goal clear` before setting a new goal.
 
 `/goal` with no arguments reports the current objective, status, token budget, token usage, and elapsed active time. A plain `/goal <objective>` starts a new goal or replaces the current one after confirmation. `/goal copy` copies the current goal objective to the system clipboard, including active, paused, budget-limited, and completed goals.
+
+`/goal edit` opens a multiline editor prefilled with the current objective in interactive and supported RPC clients.
+Saving changes only the objective and its update timestamp; it preserves the goal ID, usage, budget, status, and any blocked reason.
+The revised objective reaches subsequent model turns without interrupting a running turn or starting or resuming work.
+Completed goals remain completed.
+Canceling or saving unchanged text leaves the goal untouched; saving after the goal was cleared or replaced discards the edit.
+To start different work rather than refine the existing objective, use `/goal <objective>`.
 
 This intentionally matches Codex TUI behavior: token budgets are set through the model tool rather than parsed from `/goal --tokens`. This package keeps its objective size limit at 8000 Unicode characters.
 
