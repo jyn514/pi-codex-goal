@@ -28,15 +28,13 @@ for (const [kind, prompt] of Object.entries({ standing, full, compact, budget })
   });
 }
 
-for (const [kind, prompt] of Object.entries({ standing, full })) {
-  test(`${kind} prompt requires evidence for every requirement, not proxy success`, () => {
-    assert.match(prompt, /map every explicit requirement to concrete evidence from current files, command output, tests, PR state, or other artifacts/);
-    assert.match(prompt, /Missing, incomplete, unverified, or uncertain requirements mean unfinished work/);
-    assert.match(prompt, /Partial progress, passing tests without full requirement coverage, stopping work, or an exhausted or nearly exhausted budget do not prove completion/);
-    assert.match(prompt, /status "complete"/);
-    assert.match(prompt, /every requirement is verified and no required work remains/);
+for (const [kind, prompt] of Object.entries({ standing, full, compact })) {
+  test(`${kind} prompt requires concrete evidence for every requirement and no remaining work`, () => {
+    assert.match(prompt, /update_goal with status "complete" only when every explicit requirement has concrete verification evidence and no required work remains/);
   });
+}
 
+for (const [kind, prompt] of Object.entries({ standing, full })) {
   test(`${kind} prompt blocks only on dependencies and requires explicit resume`, () => {
     assert.match(prompt, /missing user input or external work prevents meaningful progress/);
     assert.match(prompt, /status "blocked" and a dependency reason/);
@@ -46,6 +44,27 @@ for (const [kind, prompt] of Object.entries({ standing, full })) {
     assert.match(prompt, /Never complete a blocked goal/);
   });
 }
+
+for (const [kind, prompt] of Object.entries({ standing, full, compact })) {
+  test(`${kind} prompt routes tracked implementation through verified completion to available skill guidance`, () => {
+    assert.match(prompt, /For a tracked goal requesting implementation through verified completion, read the autonomous-implementation skill file at its advertised path, if available, when starting or resuming work/);
+    assert.match(prompt, /stuck or repeatedly making no progress on that implementation goal/);
+    assert.match(prompt, /re-read its recovery guidance before choosing the next action/);
+    assert.match(prompt, /Do not activate this skill for plan-only, review, research, or writing goals/);
+    assert.doesNotMatch(prompt, /\/skill:autonomous-implementation/);
+  });
+}
+
+for (const [kind, prompt] of Object.entries({ full, compact })) {
+  test(`${kind} continuation leaves work-selection procedure to the skill`, () => {
+    assert.doesNotMatch(prompt, /Avoid repeating work that is already done/);
+    assert.doesNotMatch(prompt, /Choose the next concrete action toward the objective/);
+  });
+}
+
+test("budget-limit prompt does not request skill recovery after work has stopped", () => {
+  assert.doesNotMatch(budget, /autonomous-implementation/);
+});
 
 test("standing guidance preserves explicit goal creation authorization", () => {
   assert.match(standing, /only when the user explicitly asks you to start tracking a concrete goal/);
@@ -66,7 +85,7 @@ test("compact continuation keeps marker, budget and local guards without the ful
   assert.match(compact, /get_goal/);
   assert.match(compact, /Tokens used: 0/);
   assert.match(compact, /Tokens remaining: 10/);
-  assert.match(compact, /status "complete" only when every requirement is verified/);
+  assert.match(compact, /status "complete" only when every explicit requirement has concrete verification evidence/);
   assert.match(compact, /status "blocked"/);
   assert.match(compact, /dependency in reason/);
   assert.match(compact, /explicit \/goal resume/);

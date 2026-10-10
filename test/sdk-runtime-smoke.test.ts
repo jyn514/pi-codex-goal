@@ -117,8 +117,12 @@ test("SDK completion report includes its calling response exactly once", async (
     // Check the actual provider transcript, including all three tools, not
     // just one producer's guidelines. Repeated inline aliases are noise.
     assert.deepEqual(providerPrompt.match(/\bpi__\w+_goal\b/g), ["pi__update_goal"]);
-    assert.match(providerPrompt, /map every explicit requirement to concrete evidence/);
+    assert.match(providerPrompt, /every explicit requirement has concrete verification evidence and no required work remains/);
     assert.match(providerPrompt, /Only explicit \/goal resume reactivates a blocked goal; ordinary input does not/);
+    assert.equal(providerPrompt.match(/For a tracked goal requesting implementation through verified completion/g)?.length, 1,
+      "model-created goals receive skill routing through standing guidance without a command continuation");
+    assert.match(providerPrompt, /read the autonomous-implementation skill file at its advertised path, if available, when starting or resuming work/);
+    assert.match(providerPrompt, /Do not activate this skill for plan-only, review, research, or writing goals/);
 
     const entries = session.sessionManager.getBranch();
     const goal = reconstructGoal(entries).goal;

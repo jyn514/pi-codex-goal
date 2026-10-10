@@ -55,7 +55,7 @@ npm, Git, and local directory installs all load the TypeScript source (`extensio
 
 ## Best way to create goals
 
-Use the included `/create-goal` prompt template instead of writing a goal by hand. Agents write better goal completion contracts than humans do because they can expand a plain task into outcome, verification, constraints, iteration, audit, and blocked-stop requirements before calling the `create_goal` tool.
+Use the included `/create-goal` prompt template to turn a plain task into an objective with an outcome, verification evidence, task-specific constraints, and a completion condition before calling `create_goal`. Drafting must not add requirements or narrow the requested scope. Standing workflow instructions stay out of the saved objective.
 
 ```text
 /create-goal insert task and requirements here
@@ -225,6 +225,7 @@ While a goal is active, the extension:
 - treats completed goals as terminal for automatic transitions while allowing `/goal <objective>` and explicit `create_goal` replacement to replace goals without extra friction
 - marks the goal `budgetLimited` when a positive token budget is reached
 - sends hidden steering messages when budget is reached or when the agent is idle but the goal is still active
+- routes tracked implementation-through-verified-completion goals to the `autonomous-implementation` skill, when available, at start or resume and back to its recovery guidance when stuck; standing tool guidance covers model-created goals too, while plan-only, review, research, and writing goals do not activate the skill
 - compacts repeated hidden goal continuations before provider context so only the latest active continuation stays runnable, older ones become short bookkeeping markers, and auto-queued continuations use a compact prompt after `/goal` start or resume
 - shows Codex-style status labels with compact token or elapsed-time usage in the pi footer when UI is available
 
